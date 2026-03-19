@@ -1,0 +1,190 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  creator
+  brand
+  admin
+}
+
+enum Vertical {
+  tech
+  fitness
+}
+
+enum CampaignStatus {
+  draft
+  pending_review
+  active
+  paused
+  completed
+}
+
+enum PlacementStatus {
+  proposed
+  creator_approved
+  creator_rejected
+  active
+  paused
+  completed
+}
+
+enum TransactionType {
+  brand_charge
+  creator_payout
+}
+
+enum TransactionStatus {
+  pending
+  completed
+  failed
+}
+
+enum Gender {
+  all
+  male
+  female
+}
+
+model User {
+  id        String   @id @default(uuid()) @db.Uuid
+  email     String   @unique
+  role      UserRole
+  createdAt DateTime @default(now()) @map("created_at")
+
+  creator Creator?
+  brand   Brand?
+
+  @@map("users")
+}
+
+model Creator {
+  id                     String   @id @default(uuid()) @db.Uuid
+  userId                 String   @unique @map("user_id") @db.Uuid
+  channelName            String   @map("channel_name")
+  youtubeChannelId       String   @unique @map("youtube_channel_id")
+  avatarUrl              String?  @map("avatar_url")
+  subscriberCount        Int      @default(0) @map("subscriber_count")
+  vertical               Vertical
+  stripeConnectAccountId String?  @map("stripe_connect_account_id")
+  minCpmFloor            Decimal  @default(15.00) @map("min_cpm_floor") @db.Decimal(10, 2)
+  blockedBrandCategories String[] @default([]) @map("blocked_brand_categories")
+  onboardingComplete     Boolean  @default(false) @map("onboarding_complete")
+  createdAt              DateTime @default(now()) @map("created_at")
+
+  user       User        @relation(fields: [userId], references: [id])
+  videos     Video[]
+  placements Placement[]
+
+  @@map("creators")
+}
+
+model Video {
+  id                   String   @id @default(uuid()) @db.Uuid
+  creatorId            String   @map("creator_id") @db.Uuid
+  youtubeVideoId       String   @unique @map("youtube_video_id")
+  title                String
+  description          String   @default("") @db.Text
+  publishedAt          DateTime @map("published_at")
+  durationSeconds      Int      @map("duration_seconds")
+  totalViews           Int      @default(0) @map("total_views")
+  monthlyViews         Int      @default(0) @map("monthly_views")
+  avgWatchThroughRate  Decimal  @default(0) @map("avg_watch_through_rate") @db.Decimal(5, 2)
+  isEvergreen          Boolean  @default(false) @map("is_evergreen")
+  dynamicSlotAvailable Boolean  @default(true) @map("dynamic_slot_available")
+  tags                 String[] @default([])
+  audienceDemographics Json?    @map("audience_demographics") @db.JsonB
+  createdAt            DateTime @default(now()) @map("created_at")
+  updatedAt            DateTime @updatedAt @map("updated_at")
+
+  creator    Creator     @relation(fields: [creatorId], references: [id])
+  placements Placement[]
+
+  @@map("videos")
+}
+
+model Brand {
+  id                 String   @id @default(uuid()) @db.Uuid
+  userId             String   @unique @map("user_id") @db.Uuid
+  companyName        String   @map("company_name")
+  logoUrl            String?  @map("logo_url")
+  website            String   @default("")
+  category           String   @default("")
+  vertical           Vertical
+  stripeCustomerId   String?  @map("stripe_customer_id")
+  onboardingComplete Boolean  @default(false) @map("onboarding_complete")
+  createdAt          DateTime @default(now()) @map("created_at")
+
+  user      User       @relation(fields: [userId], references: [id])
+  campaigns Campaign[]
+
+  @@map("brands")
+}
+
+model Campaign {
+  id                   String         @id @default(uuid()) @db.Uuid
+  brandId              String         @map("brand_id") @db.Uuid
+  name                 String
+  status               CampaignStatus @default(draft)
+  targetAudienceAgeMin Int?           @map("target_audience_age_min")
+  targetAudienceAgeMax Int?           @map("target_audience_age_max")
+  targetAudienceGender Gender         @default(all) @map("target_audience_gender")
+  targetGeos           String[]       @default([]) @map("target_geos")
+  vertical             Vertical
+  budgetTotal          Decimal        @map("budget_total") @db.Decimal(10, 2)
+  budgetRemaining      Decimal        @map("budget_remaining") @db.Decimal(10, 2)
+  maxCpm               Decimal        @map("max_cpm") @db.Decimal(10, 2)
+  startDate            DateTime       @map("start_date") @db.Date
+  endDate              DateTime       @map("end_date") @db.Date
+  adCreativeUrl        String         @default("") @map("ad_creative_url")
+  createdAt            DateTime       @default(now()) @map("created_at")
+  updatedAt            DateTime       @updatedAt @map("updated_at")
+
+  brand      Brand       @relation(fields: [brandId], references: [id])
+  placements Placement[]
+
+  @@map("campaigns")
+}
+
+model Placement {
+  id            String          @id @default(uuid()) @db.Uuid
+  campaignId    String          @map("campaign_id") @db.Uuid
+  videoId       String          @map("video_id") @db.Uuid
+  creatorId     String          @map("creator_id") @db.Uuid
+  status        PlacementStatus @default(proposed)
+  agreedCpm     Decimal         @map("agreed_cpm") @db.Decimal(10, 2)
+  impressions   Int             @default(0)
+  clicks        Int             @default(0)
+  costToBrand   Decimal         @default(0) @map("cost_to_brand") @db.Decimal(10, 2)
+  creatorPayout Decimal         @default(0) @map("creator_payout") @db.Decimal(10, 2)
+  createdAt     DateTime        @default(now()) @map("created_at")
+  updatedAt     DateTime        @updatedAt @map("updated_at")
+
+  campaign     Campaign      @relation(fields: [campaignId], references: [id])
+  video        Video         @relation(fields: [videoId], references: [id])
+  creator      Creator       @relation(fields: [creatorId], references: [id])
+  transactions Transaction[]
+
+  @@map("placements")
+}
+
+model Transaction {
+  id                  String            @id @default(uuid()) @db.Uuid
+  placementId         String            @map("placement_id") @db.Uuid
+  type                TransactionType
+  amount              Decimal           @db.Decimal(10, 2)
+  stripeTransactionId String?           @map("stripe_transaction_id")
+  status              TransactionStatus @default(pending)
+  createdAt           DateTime          @default(now()) @map("created_at")
+
+  placement Placement @relation(fields: [placementId], references: [id])
+
+  @@map("transactions")
+}
