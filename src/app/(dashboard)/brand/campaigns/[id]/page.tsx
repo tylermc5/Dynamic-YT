@@ -447,13 +447,13 @@ export default function CampaignDetailPage() {
       });
 
       if (res.ok) {
-        setProposedIds((prev) => new Set([...prev, match.videoId]));
+        setProposedIds((prev) => { const s = new Set(Array.from(prev)); s.add(match.videoId); return s; });
       } else {
         // Optimistic UI for demo
-        setProposedIds((prev) => new Set([...prev, match.videoId]));
+        setProposedIds((prev) => { const s = new Set(Array.from(prev)); s.add(match.videoId); return s; });
       }
     } catch {
-      setProposedIds((prev) => new Set([...prev, match.videoId]));
+      setProposedIds((prev) => { const s = new Set(Array.from(prev)); s.add(match.videoId); return s; });
     } finally {
       setProposingId(null);
     }
@@ -646,10 +646,10 @@ export default function CampaignDetailPage() {
                       border: "1px solid #e2e8f0",
                       fontSize: "12px",
                     }}
-                    formatter={(v: number, name: string) =>
+                    formatter={(v: unknown, name: unknown) =>
                       name === "spend"
-                        ? [formatCurrency(v), "Spend"]
-                        : [formatNumber(v), "Impressions"]
+                        ? [formatCurrency(v as number), "Spend"]
+                        : [formatNumber(v as number), "Impressions"]
                     }
                   />
                   <Area
