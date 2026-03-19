@@ -264,7 +264,7 @@ export default function BrandDashboardPage() {
                   tickFormatter={(v) => `$${v}`}
                 />
                 <Tooltip
-                  formatter={(v: number) => [formatCurrency(v), "Spend"]}
+                  formatter={(v) => [formatCurrency(Number(v)), "Spend"]}
                   contentStyle={{
                     borderRadius: "6px",
                     border: "1px solid #e2e8f0",

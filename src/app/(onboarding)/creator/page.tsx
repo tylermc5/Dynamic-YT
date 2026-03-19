@@ -238,7 +238,7 @@ function Step2({
       <div>
         <Label>Blocked Brand Categories</Label>
         <p className="text-xs text-slate-400 mt-0.5 mb-3">
-          Select any categories you don't want to promote.
+          Select any categories you don&apos;t want to promote.
         </p>
         <div className="space-y-2.5">
           {BLOCKED_CATEGORY_OPTIONS.map((opt) => {
@@ -312,7 +312,7 @@ function Step3({
               Stripe Connected
             </p>
             <p className="text-xs text-green-600">
-              You're all set to receive payouts.
+              You&apos;re all set to receive payouts.
             </p>
           </div>
         </div>

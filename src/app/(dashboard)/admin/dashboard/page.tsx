@@ -194,7 +194,7 @@ export default function AdminDashboardPage() {
                 <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
                 <XAxis dataKey="month" tick={{ fontSize: 12 }} />
                 <YAxis tick={{ fontSize: 12 }} />
-                <Tooltip formatter={(v: number) => formatCurrency(v)} />
+                <Tooltip formatter={(v) => formatCurrency(Number(v))} />
                 <Bar dataKey="gmv" fill="#e2e8f0" name="GMV" radius={[4, 4, 0, 0]} />
                 <Bar dataKey="revenue" fill="#0f172a" name="Revenue" radius={[4, 4, 0, 0]} />
               </BarChart>

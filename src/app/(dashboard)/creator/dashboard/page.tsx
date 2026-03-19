@@ -266,7 +266,7 @@ export default function CreatorDashboardPage() {
                   tickFormatter={(v) => `$${v}`}
                 />
                 <Tooltip
-                  formatter={(value: number) => [formatCurrency(value), "Earnings"]}
+                  formatter={(value) => [formatCurrency(Number(value)), "Earnings"]}
                   contentStyle={{
                     backgroundColor: "#fff",
                     border: "1px solid #e2e8f0",

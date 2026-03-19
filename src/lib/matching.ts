@@ -1,4 +1,4 @@
-import { Decimal } from '@/generated/prisma/runtime/library'
+import { Decimal } from '@/generated/prisma/runtime/client'
 
 interface VideoForMatching {
   id: string
