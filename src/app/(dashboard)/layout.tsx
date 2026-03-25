@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { Tv, LayoutDashboard, Video, PlaySquare, DollarSign, Megaphone, Users, Building2, LogOut, ChevronRight } from "lucide-react";
+import { Tv, LayoutDashboard, Video, PlaySquare, DollarSign, Megaphone, Users, Building2, LogOut, ChevronRight, Search, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
@@ -46,6 +46,8 @@ function getNavItems(role: string): NavItem[] {
     return [
       { href: "/brand/dashboard", label: "Dashboard", icon: LayoutDashboard },
       { href: "/brand/campaigns", label: "Campaigns", icon: Megaphone },
+      { href: "/brand/marketplace", label: "Marketplace", icon: Search },
+      { href: "/brand/billing", label: "Billing", icon: CreditCard },
     ];
   }
   if (role === "admin") {
